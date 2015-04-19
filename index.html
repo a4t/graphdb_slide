@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>reveal.js - The HTML Presentation Framework</title>
+
+		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+		<meta name="author" content="Hakim El Hattab">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/simple.css" id="theme">
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+			<div class="slides">
+				<section data-markdown>
+					<script type="text/template">
+						## 今日から始めるグラフDB
+
+						[@shigure_onishi](http://qiita.com/shigure_onishi)
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## 今日のゴール
+						路線図を作って出発地 → 目的地の最短距離を算出
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## アジェンダ
+
+						- グラフとは
+						- グラフ理論の始まり
+						- グラフデータベースとは
+						- グラフデータベースの構成
+						- データベースの比較
+						- グラフデータベースの使用例
+						- Neo4j + Cypher
+						- デモ
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						# グラフとは
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## グラフとは
+
+						`頂点` と `辺` による繋がりの集合
+						![node_relation](./GraphDB/node_relation.png "node_relation")
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## グラフ理論の始まり
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## グラフ理論の始まり
+						18世紀の初めごろプロイセン王国の首都  
+						ケーニヒスベルクという町で出来事  
+									　  
+						「7つの橋を2度通らずに全て渡って  
+						元の所に帰ってくることができるか 」  
+									　  
+						※ ただし、どこから開始しても良い
+
+						![brige](./GraphDB/brige.jpg "brige")
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### 一筆書きの証明
+						どちらかの条件を満たせば一筆書きは可能
+					</script>
+				</section>
+
+
+				<section data-markdown>
+					<script type="text/template">
+						### 2つの条件
+						図形のどの端の点からも `偶数本` の線が出ていた場合  
+									　  
+						図形の端の点から`奇数本の線` が出ている箇所が  
+						`二箇所` までの場合  
+						(奇数本の線が出ている点が始点 or 終点の場合)
+
+						![cert](./GraphDB/cert.png "cert")
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### ケーニヒスベルクの橋の置き換え
+
+						レオンハルト・オイラーは  
+						この図をこのように置き換えて証明した
+
+						![oira_1](./GraphDB/oira_1.png "oira_1")
+						![oira_2](./GraphDB/oira_2.png "oira_2")
+					</script>
+				</section>
+
+
+				<section data-markdown>
+					<script type="text/template">
+						その他のグラフ表現
+
+						![relationship](./GraphDB/relationship.png "relationship")
+
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## グラフデータベースとは
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## グラフデータベースとは
+
+						- CRUD(Create/Read/Update/Delete)対応  
+						- 情報と情報をつなぐ関係性を表現することができる
+						- インデックスなし隣接性
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### インデックスなし隣接性
+
+						データベース内で繋がっているノードが  
+						お互いを指している状態  
+									　  
+						これのおかげでグラフDBは大幅な  
+						パフォーマンス利点を得ている
+
+						※ この辺りはまた後で説明
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### 馴染みのあるDBでも表現できる  
+
+						RDBMSでもNoSQLでも  
+						グラフデータベースを作ることはできる  
+									　  
+						ただし、ネイティブなグラフストレージではないので  
+						パフォーマンスは期待できない
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## グラフデータベースの構成
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## グラフデータベースの構成
+
+						![structure](./GraphDB/structure.jpg "structure")
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### グラフ理論
+
+						先ほど説明したので省略
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### グラフデータベース
+						- Neo4j
+						- InfiniteGraph
+						- Sparksee
+						- AllegroGraph
+						- OrientDB
+						- Titan
+						- FlockDB(Twitter インメモリ)
+						
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## 他のデータベースの比較
+						- RDBMS
+						- ドキュメント
+						- キーバリュー
+						- カラムファミリー
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## RDBMS
+						- Mysql、PostgreSQL、Oracleなど
+
+						実はRDBMSは繋がりを表現することが苦手である  
+						
+						例えば友達の友達を検索する時
+
+						```
+						SELECT
+							friend_friend.target_user_id
+						FROM users
+						LEFT JOIN friends AS my_frined
+							ON (users.id = my_frined.user_id) AS my_friends
+						LEFT JOIN friends AS friend_friend
+							ON (my_friends.target_user_id = friend_friend.user_id)
+						WHERE user_id = 1234
+						```
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## Neo4j
+						すごくわかりやすい！
+
+						```
+						MATCH
+							(me)-[:friend]->(my_friend)-[:friend]->(friend_friend)
+						WHERE
+							me.id 1234
+						RETURN
+							friend_friend.id
+						```
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## その他NoSQL
+
+						- キーバリュー(Memcache)  
+						高速ではあるがそもそも対となるものを保存するもの  
+						リクエスト数が増える可能性が高い
+
+						- ドキュメント(MongoDB)  
+						繋がりを表現するものではないのでこちらも同様  
+
+						- カラムファミリー(Cassandra)  
+						グラフに近いがやはり行と行を繋ぐことは  
+						アプリケーション側でのフォローが必要  
+						`集約ストア` では難しい
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## Neo4jは何故早いか
+
+						インデックスなし隣接性がポイント  
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### こんなグラフがあった時
+
+						![map1](./GraphDB/map1.png "map1")
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### 検索をする時、まずNodeをみつける
+						
+						![map2](./GraphDB/map2.png "map2")
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### Nodeから伸びている辺しか見ない
+
+						![map3](./GraphDB/map3.png "map3")
+
+						つながっていないNodeは処理対象にならない  
+						この状態から `WHERE` で絞ったりする
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### だから早い
+
+						![map4](./GraphDB/map4.png "map4")
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### 処理の早さ
+
+						RDBMSの処理の早さは  
+						全体のデータ量と一致件数によって算出される  
+						`O(m log n) = 処理速度`  
+								.  
+								.  
+						グラフデータベースは  
+						一致件数のみで決まる  
+						`O(n) = 処理速度`
+
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### グラフデータベースは早い！
+						
+						データがどれだけ増えても  
+						繋がりが少なければ処理が早い
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### グラフデータベース最強
+
+						- トランザクション処理可能
+						- スケーリング対応
+						- キャッシュあり
+						- 障害後の復旧も容易
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### グラフデータベース最強
+
+						パフォーマンス面でも最強！  
+								　  
+						とあるデータを使ってRDBMSと比較した  
+								　  
+						それぞれが50人の友達を持つ100万人規模のSNS
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### グラフデータベース最強
+
+						※ 単位は秒
+
+						友達の友達(2500件Hit)  
+						RDBMS 0.016　 | 　Neo4j 0.01  
+								　  
+						友達の友達の友達(11万件Hit)  
+						RDB 30.267　 | 　Neo4j 0.168  
+								　  
+						友達の友達の友達(60万件Hit)  
+						RDB 1543.505　 | 　Neo4j 1.359  
+								　  
+						友達の友達の友達(80万件Hit)  
+						RDB 測定不能　 | 　Neo4j 2.132  
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### グラフデータベース最強
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## そんなわけない
+						
+						RDBはやはり集計など表という扱いをする時は非常に強い
+								　  
+						こんな処理とかできない
+						```
+						UPDATE
+							users
+						SET
+							point = point + 100
+						```
+
+						集計もできなくないが弱い
+						```
+						SELECT
+							SUM(point)
+						FROM
+							users
+						```
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## DBは正しく使おう
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						# グラフデータベース使用例
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## グラフデータベース使用例
+						
+						- 路線図
+						- レコメンド
+						- 友達の友達
+						- ネットワーク構成
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### ネットワーク構成
+
+						こんなアプリがあったとして
+						
+						![spof_1](./GraphDB/spof_1.png "spof_1")
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### 単一障害を見つける
+						
+						![spof_2](./GraphDB/spof_2.png "spof_2")
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### クエリ
+						
+						```
+						MATCH
+							(user)
+								-[:request_network*]->
+							(rds)
+								-[:return_network*]->
+							(user)
+						WHERE
+							user.name onishi
+							rds.name rds1
+						RETURN
+							count(rds)
+						```
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## Neo4j + Cypher
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### Neo4j
+
+						プロパティグラフを表現するのに適したDB  
+						オープンソース  
+						NoSQL
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### プロパティグラフとは？
+
+						![property](./GraphDB/property.jpg "property")
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### ハイパーグラフ
+
+						![hyper](./GraphDB/hyper.png "hyper")
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### トリプル
+
+						主語 → 述語 → 目的語
+
+						僕が 貴方と 話す
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### グラフ表現方法は色々ある
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### Cypher
+						SQLみたいなもの、今まで散々書いてたアレ
+
+						- データの登録方法はNodeと繋がりで違う
+						- 基本はMATCH、WHERE，RETURNでデータを返す
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### SQLっぽいもの
+
+						- WHERE
+						- CREATE (INSERT)
+						- DELETE
+						- UNION
+						- SET (UPDATE)
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						# デモ
+					</script>
+				</section>
+
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
